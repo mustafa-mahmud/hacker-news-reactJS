@@ -11,12 +11,35 @@ import reducer from './reducer';
 
 const API_ENDPOINT = 'https://hn.algolia.com/api/v1/search?';
 
-const initialState = {};
+const initialState = {
+  hits: [],
+  nbPages: 0,
+  query: 'react',
+  loading: false,
+};
 
 const AppContext = React.createContext();
 
 const AppProvider = ({ children }) => {
-  return <AppContext.Provider value="hello">{children}</AppContext.Provider>;
+  const [state, dispatch] = useReducer(reducer, initialState);
+
+  const fetchStories = async () => {
+    dispatch({ type: SET_LOADING });
+
+    const res = await fetch(`${API_ENDPOINT}query=${state.query}`);
+    const data = await res.json();
+
+    console.log(data);
+    dispatch({ type: SET_STORIES, payload: data });
+  };
+
+  useEffect(() => {
+    fetchStories();
+  }, []);
+
+  return (
+    <AppContext.Provider value={{ ...state }}>{children}</AppContext.Provider>
+  );
 };
 
 export const useGlobalContext = () => useContext(AppContext);
