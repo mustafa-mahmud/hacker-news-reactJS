@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useReducer } from 'react';
+import React, { useContext, useEffect, useReducer, useState } from 'react';
 
 import {
   SET_LOADING,
@@ -25,20 +25,29 @@ const AppProvider = ({ children }) => {
 
   const fetchStories = async () => {
     dispatch({ type: SET_LOADING });
-
+    console.log(state);
     const res = await fetch(`${API_ENDPOINT}query=${state.query}`);
     const data = await res.json();
 
-    console.log(data);
     dispatch({ type: SET_STORIES, payload: data });
+  };
+
+  const handleSearch = (query) => {
+    dispatch({ type: HANDLE_SEARCH, payload: query });
+  };
+
+  const removeItem = (id) => {
+    dispatch({ type: REMOVE_STORY, payload: id });
   };
 
   useEffect(() => {
     fetchStories();
-  }, []);
+  }, [state.query]);
 
   return (
-    <AppContext.Provider value={{ ...state }}>{children}</AppContext.Provider>
+    <AppContext.Provider value={{ ...state, handleSearch, removeItem }}>
+      {children}
+    </AppContext.Provider>
   );
 };
 

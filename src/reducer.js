@@ -7,8 +7,6 @@ import {
 } from './actions';
 
 const reducer = (state, action) => {
-  console.log(action.type);
-
   switch (action.type) {
     case SET_STORIES:
       const { hits, nbPages, query } = action.payload;
@@ -16,8 +14,19 @@ const reducer = (state, action) => {
 
     case SET_LOADING:
       return { ...state, loading: true };
+
+    case HANDLE_SEARCH:
+      return { ...state, loading: true, query: action.payload };
+
+    case REMOVE_STORY:
+      const newHits = state.hits.filter(
+        (hit) => hit.objectID !== action.payload
+      );
+      return { ...state, hits: newHits };
+
     default:
       throw new Error('Type does not match with any Dispatch');
   }
 };
+
 export default reducer;
